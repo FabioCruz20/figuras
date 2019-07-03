@@ -62,7 +62,8 @@
 
         gl_Position = vec4(clipspace * vec2(1, -1), 0, 1);*/
 
-        gl_Position = (u_matrix_projecao * u_matrix_translacao * u_matrix_rotacao_x * a_position);
+        gl_Position = (u_matrix_projecao * u_matrix_translacao * u_matrix_rotacao_x *
+            u_matrix_rotacao_y * u_matrix_rotacao_z * u_matrix_escala * a_position);
     }
 </script>
 <script type="notjs" id="fragment-shader">
