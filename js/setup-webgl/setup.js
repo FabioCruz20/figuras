@@ -88,12 +88,13 @@ function criaBuffer(gl) {
  * 6
  * @param {*} gl 
  * @param {*} buffer 
+ * @param {*} tipo
  * @param {*} dados 
  */
-function carregaBuffer(gl, buffer, dados) {
+function carregaBuffer(gl, buffer, tipo, dados) {
 
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(dados), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, new tipo(dados), gl.STATIC_DRAW);
 }
 
 /**
@@ -105,7 +106,9 @@ function configuraDisplay(gl) {
     webglUtils.resizeCanvasToDisplaySize(gl.canvas);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.clearColor(0, 0, 0, 0);
-    gl.clear(gl.BUFFER_COLOR_BIT);
+    gl.clear(gl.BUFFER_COLOR_BIT | gl.DEPTH_BUFFER_BIT); // limpa o canvas
+    gl.enable(gl.CULL_FACE); 
+    gl.enable(gl.DEPTH_TEST); // habilita algoritmo depth buffer
 }
 
 /**
@@ -176,7 +179,7 @@ function setup(gl, figura) {
     const program = preparaPrograma(gl, 'vertex-shader', 'fragment-shader');
 
     // buff de dados
-    locais = buscaLocalizacoes(gl, program, ['a_position'], ['u_resolution', 
+    locais = buscaLocalizacoes(gl, program, ['a_position', 'a_color'], ['u_resolution', 
         'u_matrix_escala', 'u_matrix_translacao', 'u_matrix_rotacao_x', 
         'u_matrix_rotacao_y', 'u_matrix_rotacao_z', 'u_matrix_projecao']);
 
@@ -188,7 +191,11 @@ function setup(gl, figura) {
     //let t1 = new Triangulo();
     carregaBuffer(gl, positionBuffer, t1.getFace());
     */
-    carregaBuffer(gl, positionBuffer, figura.getFace());
+    carregaBuffer(gl, positionBuffer, Float32Array, figura.getFace());
+
+    // configura o buffer para as cores da figura
+    let colorBuffer = criaBuffer(gl);
+    carregaBuffer(gl, colorBuffer, Uint8Array, figura.getCor());
 
     // configura display
     configuraDisplay(gl);
@@ -198,6 +205,7 @@ function setup(gl, figura) {
 
     // configura a passagem de dados para o attributo no programa glsl
     configuraAttrib(gl, locais['attribs'][0], positionBuffer);
+    configuraAttrib(gl, locais['attribs'][1], colorBuffer, 3, gl.UNSIGNED_BYTE);
 
     // configura a resolução no programa glsl
     configuraResolucaoUniform(gl, locais['uniforms'][0]);
