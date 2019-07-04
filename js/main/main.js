@@ -7,7 +7,7 @@ function main() {
         return;
     }
 
-    let t1 = new Piramide();
+    let t1 = new Octaedro();
     // configuração inicial do webgl
     locais = setup(gl, t1);
 
@@ -20,5 +20,5 @@ function main() {
     inicializaInterface(gl, gl.LINE_LOOP, t1.getNumVertices(), locais, transf);
 
     // desenha
-    desenha(gl, gl.LINE_LOOP, t1.getNumVertices(), locais, transf);
+    desenha(gl, gl.LINE_LOOOP, t1.getNumVertices(), locais, transf);
 }
