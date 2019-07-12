@@ -156,6 +156,20 @@ function configuraMatrizUniform(gl, localUniform, matriz) {
 }
 
 /**
+ * 
+ * @param {*} gl 
+ * @param {*} localUniform 
+ * @param {*} vetor 
+ */
+function configuraVetorUniform(gl, localUniform, vetor) {
+    gl.uniform4fv(localUniform, vetor);
+}
+
+function configuraFloatUniform(gl, localUniform, valor) {
+    gl.uniform1f(localUniform, valor);
+}
+
+/**
  * 12
  * @param {*} gl 
  * @param {*} tipoForma 
@@ -178,7 +192,8 @@ function setup(gl, figura) {
     // buff de dados
     locais = buscaLocalizacoes(gl, program, ['a_position'], ['u_resolution', 
         'u_matrix_escala', 'u_matrix_translacao', 'u_matrix_rotacao_x', 
-        'u_matrix_rotacao_y', 'u_matrix_rotacao_z', 'u_matrix_projecao']);
+        'u_matrix_rotacao_y', 'u_matrix_rotacao_z', 'u_matrix_projecao', 
+        'ang_x', 'ang_y', 'ang_z']);
 
 
     let positionBuffer = criaBuffer(gl);
@@ -234,6 +249,9 @@ function desenha(gl, tipoForma=gl.LINE_LOOP, numVertices, locais,
     configuraMatrizUniform(gl, locais['uniforms'][4], matrizRotacaoY);
     configuraMatrizUniform(gl, locais['uniforms'][5], matrizRotacaoZ);
     configuraMatrizUniform(gl, locais['uniforms'][6], matrizProjecao);
+    configuraFloatUniform(gl, locais['uniforms'][7], angRadX);
+    configuraFloatUniform(gl, locais['uniforms'][8], angRadY);
+    configuraFloatUniform(gl, locais['uniforms'][9], angRadZ);
     
     gl.drawArrays(tipoForma, 0, numVertices);
 }
