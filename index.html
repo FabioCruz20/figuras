@@ -33,7 +33,6 @@
     <script src="js/setup-webgl/webgl-utils.js"></script>
     <script src="js/setup-webgl/setup.js"></script>
     <script src="js/classes/3d/figura3d.js"></script>
-    <script src="js/classes/3d/triangulo3d.js"></script>
     <script src="js/classes/3d/piramide.js"></script>
     <script src="js/eventos/eventos.js"></script>
     <script src="js/main/main.js"></script>
@@ -42,6 +41,9 @@
     precision mediump float;
 
     attribute vec4 a_position;
+    attribute vec4 a_color;
+
+    varying vec4 v_color;
 
     uniform vec2 u_resolution;
     uniform mat4 u_matrix_escala;
@@ -121,12 +123,15 @@
         vec4 p = rotacionar(pos, ang_x, ang_y, ang_z);
 
         gl_Position = (u_matrix_projecao * u_matrix_translacao * u_matrix_escala * p );
+        v_color = a_color;
     }
 </script>
 <script type="notjs" id="fragment-shader">
     precision mediump float;
 
+    varying vec4 v_color;
+
     void main() {
-        gl_FragColor = vec4(0.2, 0.1, 0.3, 1.0);
+        gl_FragColor = v_color; //vec4(0.2, 0.1, 0.3, 1.0);
     }
 </script>

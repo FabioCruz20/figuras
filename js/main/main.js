@@ -17,8 +17,8 @@ function main() {
         'rotacao': [0, 0, 0]
     };
 
-    inicializaInterface(gl, gl.LINE_LOOP, t1.getNumVertices(), locais, transf);
+    inicializaInterface(gl, gl.TRIANGLES, t1.getNumVertices(), locais, transf);
 
     // desenha
-    desenha(gl, gl.LINE_LOOP, t1.getNumVertices(), locais, transf);
+    desenha(gl, gl.TRIANGLES, t1.getNumVertices(), locais, transf);
 }
