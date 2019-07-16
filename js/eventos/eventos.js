@@ -53,43 +53,32 @@ function animar(gl, tipoForma, numVertices, locais, dados) {
         sentido.push(sent);
     }
 
+    // x, y e z iniciais
     dados.translacao[0] = pIni[0];
     dados.translacao[1] = pIni[1];
     dados.translacao[2] = pIni[2];
 
     desenha(gl, tipoForma, numVertices, locais, dados);
 
-    /*
-    let k = 0;
-    let id = setInterval(() => {
-
-        if (k == 50) {
-            clearInterval(id);
-        }
-
-        dados.translacao[0] += 1;
-        dados.translacao[1] += 1;
-
-        desenha(gl, tipoForma, numVertices, locais, dados);
-        k++;
-    },
-    100);
-    */
-    let unidade = 2;
-    let comprX = pFim[0] - pIni[0];
+    let unidade = 2; // unidade de movimentação
+    // comprimentos das componentes x, y e z do percurso
+    let comprX = pFim[0] - pIni[0]; 
     let comprY = pFim[1] - pIni[1];
     let comprZ = pFim[2] - pIni[2];
 
+    // comprimento do vetor do percurso. Distância entre dois pontos
     let compr = Math.sqrt(
         Math.pow(comprX, 2) + 
         Math.pow(comprY, 2) + 
         Math.pow(comprZ, 2)
     );
 
+    // definindo a "velocidade" a andar em cada direção
     let ptX = (comprX / compr) * unidade;
     let ptY = (comprY / compr) * unidade;
     let ptZ = (comprZ / compr) * unidade;
 
+    // continuar desenhando
     let acabou = false;
     let k = 0;
     let idIntervalo = setInterval(() => {
@@ -142,7 +131,7 @@ function animar(gl, tipoForma, numVertices, locais, dados) {
         }*/
         
     },
-    100);
+    10);
 
     //console.log(dados);
 }

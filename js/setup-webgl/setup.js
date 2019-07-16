@@ -249,7 +249,12 @@ function desenha(gl, tipoForma=gl.LINE_LOOP, numVertices, locais,
     let matrizRotacaoX = m4.rotacaoX(angRadX);
     let matrizRotacaoY = m4.rotacaoY(angRadY);
     let matrizRotacaoZ = m4.rotacaoZ(angRadZ);
-    let matrizProjecao = m4.projecao(gl.canvas.clientWidth, gl.canvas.clientHeight, 400);
+    //let matrizProjecao = m4.projecao(gl.canvas.clientWidth, gl.canvas.clientHeight, 400);
+    let aspecto = gl.canvas.clientWidth / gl.canvas.clientHeight;
+    let zNear = 1;
+    let zFar = 2000;
+    let campoVisaoRad = 60 * Math.PI / 180;
+    let matrizProjecao = m4.perspectiva(campoVisaoRad, aspecto, zNear, zFar);
 
     configuraMatrizUniform(gl, locais['uniforms'][1], matrizEscala);
     configuraMatrizUniform(gl, locais['uniforms'][2], matrizTranslacao);

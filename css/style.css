@@ -1,6 +1,29 @@
 canvas {
-    width: 400px;
-    height: 300px;
-    display: block;
+    width: 900px;
+    height: 600px;
     border: 1px solid #000;
+    float: left;
+    margin-right: 30px;
+}
+
+form {
+    box-sizing: border-box;
+    width: 400px;
+    float: left;
+    padding: 40px 20px;
+    height: 600px;
+    border: 1px solid #000;
+}
+
+formgroup {
+    margin-bottom: 20px;
+    display: block;
+}
+
+formgroup input[type="range"], formgroup input[type="number"] {
+    width: 25%;
+}
+
+button {
+    margin-top: 20px;
 }
