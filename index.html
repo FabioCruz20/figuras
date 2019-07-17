@@ -8,24 +8,58 @@
     <body onload="main()">
         <canvas id="canvas"></canvas>
         <form>
-            <formgroup>
+            <fieldset>
                 <legend>Translação</legend>
-                X: <input type="range" id="t0" min="0" max="400">
-                Y: <input type="range" id="t1" min="0" max="300">
-                Z: <input type="range" id="t2" min="-200" max="200">
-            </formgroup>
-            <formgroup>
+                <label>X:</label>
+                <input type="range" id="t0" min="-200" max="200" value="0">
+                <label>Y:</label>
+                <input type="range" id="t1" min="-200" max="200" value="0">
+                <label>Z: </label><input type="range" id="t2" min="-1000" max="0" value="-500">
+            </fieldset>
+            <fieldset>
                 <legend>Rotação</legend>
-                X: <input type="range" id="r0" min="0" max="360">
-                Y: <input type="range" id="r1" min="0" max="360">
-                Z: <input type="range" id="r2" min="0" max="360">
-            </formgroup>
-            <formgroup>
+                <label>X: </label>
+                <input type="range" id="r0" min="0" max="360">
+                <label>Y: </label>
+                <input type="range" id="r1" min="0" max="360">
+                <label>Z: </label>
+                <input type="range" id="r2" min="0" max="360">
+            </fieldset>
+            <fieldset>
                 <legend>Escala</legend>
-                X: <input type="range" id="s0" min="0.1" max="2" step="0.1">
-                Y: <input type="range" id="s1" min="0.1" max="2" step="0.1">
-                Z: <input type="range" id="s2" min="0.1" max="2" step="0.1">
-            </formgroup>
+                <label>X: </label>
+                <input type="range" id="s0" min="0.1" max="2" step="0.1">
+                <label>Y: </label>
+                <input type="range" id="s1" min="0.1" max="2" step="0.1">
+                <label>Z: </label>
+                <input type="range" id="s2" min="0.1" max="2" step="0.1">
+            </fieldset>
+            <fieldset>
+                <legend>Ponto inicial</legend>
+                <label>X: </label>
+                <input type="number" id="pinicio0" min="-200" max="200" value="0">
+                <label>Y: </label>
+                <input type="number" id="pinicio1" min="-200" max="200" value="0">
+                <label>Z: </label>
+                <input type="number" id="pinicio2" min="-1000" max="0" value="-500">
+            </fieldset>
+            <fieldset>
+                <legend>Ponto final</legend>
+                <label>X: </label>
+                <input type="number" id="pfinal0" min="-200" max="200" value="0">
+                <label>Y: </label>
+                <input type="number" id="pfinal1" min="-200" max="200" value="0">
+                <label>Z: </label>
+                <input type="number" id="pfinal2" min="-1000" max="0" value="-500">
+            </fieldset>
+            <fieldset>
+                <button type="button" id="mover">Mover</button>
+            </fieldset>
+            <fieldset>
+                <h4>Observação:</h4>
+                <p>Intervalos de translação para X e Y: [-200, 200]</p>
+                <p>Intervalos de translação para Z: [-1000, 0]</p>
+            </fieldset>
         </form>
     </body>
     <script src="js/matrizes/matriz3.js"></script>
@@ -33,8 +67,7 @@
     <script src="js/setup-webgl/webgl-utils.js"></script>
     <script src="js/setup-webgl/setup.js"></script>
     <script src="js/classes/3d/figura3d.js"></script>
-    <script src="js/classes/3d/triangulo3d.js"></script>
-    <script src="js/classes/3d/piramide.js"></script>
+    <script src="js/classes/3d/tetraedro.js"></script>
     <script src="js/eventos/eventos.js"></script>
     <script src="js/main/main.js"></script>
 </html>
@@ -42,6 +75,9 @@
     precision mediump float;
 
     attribute vec4 a_position;
+    attribute vec4 a_color;
+
+    varying vec4 v_color;
 
     uniform vec2 u_resolution;
     uniform mat4 u_matrix_escala;
@@ -50,6 +86,56 @@
     uniform mat4 u_matrix_rotacao_y;
     uniform mat4 u_matrix_rotacao_z;
     uniform mat4 u_matrix_projecao;
+    uniform float ang_x;
+    uniform float ang_y;
+    uniform float ang_z; // ângulo de rotação em torno de z
+
+    vec4 quat_mult(vec4 q1, vec4 q2)
+    { 
+        vec4 qr;
+        qr.x = (q1.w * q2.x) + (q1.x * q2.w) + (q1.y * q2.z) - (q1.z * q2.y);
+        qr.y = (q1.w * q2.y) - (q1.x * q2.z) + (q1.y * q2.w) + (q1.z * q2.x);
+        qr.z = (q1.w * q2.z) + (q1.x * q2.y) - (q1.y * q2.x) + (q1.z * q2.w);
+        qr.w = (q1.w * q2.w) - (q1.x * q2.x) - (q1.y * q2.y) - (q1.z * q2.z);
+        return qr;
+    }
+
+    vec4 quat_rotacao(float ang, vec3 vet_eixo) {
+        float meio_ang = ang * 0.5 * 3.14159 / 180.0;
+        vec4 quat = vec4(
+            vet_eixo.x * sin(meio_ang),
+            vet_eixo.y * sin(meio_ang),
+            vet_eixo.z * sin(meio_ang),
+            cos(meio_ang)
+        );
+        return quat;
+    }
+
+    vec4 conjugado(vec4 quaternio) {
+        vec4 conj = vec4(
+            -quaternio.x,
+            -quaternio.y,
+            -quaternio.z,
+            quaternio.w
+        );
+        return conj;
+    }
+
+    vec4 rotacionar(vec4 posicao, float ang_x, float ang_y, float ang_z) {
+        vec4 quat_rot_x = quat_rotacao(ang_x, vec3(1.0, 0.0, 0.0));
+        vec4 quat_rot_y = quat_rotacao(ang_y, vec3(0.0, 1.0, 0.0));
+        vec4 quat_rot_z = quat_rotacao(ang_z, vec3(0.0, 0.0, 1.0));
+
+        vec4 quat_rot_xy = quat_mult(quat_rot_x, quat_rot_y);
+        vec4 quat_rot_xyz = quat_mult(quat_rot_xy, quat_rot_z);
+
+        vec4 conj = conjugado(quat_rot_xyz);
+
+        vec4 temp = quat_mult(quat_rot_xyz, posicao);
+        vec4 nova_pos = quat_mult(temp, conj);
+
+        return vec4(nova_pos.x, nova_pos.y, nova_pos.z, 1);
+    }
 
     void main() {
         //vec2 position = (u_matrix_escala * u_matrix_translacao * u_matrix_rotacao * a_position).xy;
@@ -62,14 +148,24 @@
 
         gl_Position = vec4(clipspace * vec2(1, -1), 0, 1);*/
 
-        gl_Position = (u_matrix_projecao * u_matrix_translacao * u_matrix_rotacao_x *
-            u_matrix_rotacao_y * u_matrix_rotacao_z * u_matrix_escala * a_position);
+        /*gl_Position = (u_matrix_projecao * u_matrix_translacao * u_matrix_rotacao_x *
+            u_matrix_rotacao_y * u_matrix_rotacao_z * u_matrix_escala * a_position);*/
+
+        // vetor posição do vértice
+        vec4 pos = vec4(a_position.xyz, 0);
+
+        vec4 p = rotacionar(pos, ang_x, ang_y, ang_z);
+
+        gl_Position = (u_matrix_projecao * u_matrix_translacao * u_matrix_escala * p );
+        v_color = a_color;
     }
 </script>
 <script type="notjs" id="fragment-shader">
     precision mediump float;
 
+    varying vec4 v_color;
+
     void main() {
-        gl_FragColor = vec4(0.2, 0.1, 0.3, 1.0);
+        gl_FragColor = v_color; //vec4(0.2, 0.1, 0.3, 1.0);
     }
 </script>

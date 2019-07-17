@@ -2,6 +2,7 @@ class Figura3d {
 
     constructor() {
         this.face = [];
+        this.cor = [];
     }
 
     getNumVertices() {
@@ -10,5 +11,9 @@ class Figura3d {
 
     getFace() {
         return this.face;
+    }
+
+    getCor() {
+        return this.cor;
     }
 }

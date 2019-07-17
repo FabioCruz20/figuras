@@ -64,5 +64,17 @@ const m4 = {
              0, 0, p, 0,
             -1, 1, 0, 1
         ];
+    },
+
+    perspectiva(campoVisaoRad, aspecto, near, far) {
+        let f = Math.tan(Math.PI * 0.5 - 0.5 * campoVisaoRad);
+        let intervaloInverso = 1.0 / (near - far);
+
+        return [
+            f / aspecto, 0, 0,                                0,
+            0,           f, 0,                                0,
+            0,           0, (near + far) * intervaloInverso, -1,
+            0,           0, near * far * intervaloInverso * 2, 0
+        ];
     }
 }

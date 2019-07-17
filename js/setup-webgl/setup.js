@@ -90,10 +90,10 @@ function criaBuffer(gl) {
  * @param {*} buffer 
  * @param {*} dados 
  */
-function carregaBuffer(gl, buffer, dados) {
+function carregaBuffer(gl, buffer, TipoDados, dados) {
 
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(dados), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, new TipoDados(dados), gl.STATIC_DRAW);
 }
 
 /**
@@ -105,7 +105,10 @@ function configuraDisplay(gl) {
     webglUtils.resizeCanvasToDisplaySize(gl.canvas);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.clearColor(0, 0, 0, 0);
-    gl.clear(gl.BUFFER_COLOR_BIT);
+    // z-buffer
+    gl.clear(gl.BUFFER_COLOR_BIT | gl.DEPTH_BUFFER_BIT); // limpa o canvas
+    gl.enable(gl.CULL_FACE); // não desenha triângulos da face traseira
+    gl.enable(gl.DEPTH_TEST); // habilita z-buffer
 }
 
 /**
@@ -156,6 +159,20 @@ function configuraMatrizUniform(gl, localUniform, matriz) {
 }
 
 /**
+ * 
+ * @param {*} gl 
+ * @param {*} localUniform 
+ * @param {*} vetor 
+ */
+function configuraVetorUniform(gl, localUniform, vetor) {
+    gl.uniform4fv(localUniform, vetor);
+}
+
+function configuraFloatUniform(gl, localUniform, valor) {
+    gl.uniform1f(localUniform, valor);
+}
+
+/**
  * 12
  * @param {*} gl 
  * @param {*} tipoForma 
@@ -176,9 +193,10 @@ function setup(gl, figura) {
     const program = preparaPrograma(gl, 'vertex-shader', 'fragment-shader');
 
     // buff de dados
-    locais = buscaLocalizacoes(gl, program, ['a_position'], ['u_resolution', 
+    locais = buscaLocalizacoes(gl, program, ['a_position', 'a_color'], ['u_resolution', 
         'u_matrix_escala', 'u_matrix_translacao', 'u_matrix_rotacao_x', 
-        'u_matrix_rotacao_y', 'u_matrix_rotacao_z', 'u_matrix_projecao']);
+        'u_matrix_rotacao_y', 'u_matrix_rotacao_z', 'u_matrix_projecao', 
+        'ang_x', 'ang_y', 'ang_z']);
 
 
     let positionBuffer = criaBuffer(gl);
@@ -188,7 +206,11 @@ function setup(gl, figura) {
     //let t1 = new Triangulo();
     carregaBuffer(gl, positionBuffer, t1.getFace());
     */
-    carregaBuffer(gl, positionBuffer, figura.getFace());
+    carregaBuffer(gl, positionBuffer, Float32Array, figura.getFace());
+
+    // carrega o buffer de cores da figura
+    let colorBuffer = criaBuffer(gl);
+    carregaBuffer(gl, colorBuffer, Uint8Array, figura.getCor());
 
     // configura display
     configuraDisplay(gl);
@@ -198,6 +220,7 @@ function setup(gl, figura) {
 
     // configura a passagem de dados para o attributo no programa glsl
     configuraAttrib(gl, locais['attribs'][0], positionBuffer);
+    configuraAttrib(gl, locais['attribs'][1], colorBuffer, 3, gl.UNSIGNED_BYTE, true);
 
     // configura a resolução no programa glsl
     configuraResolucaoUniform(gl, locais['uniforms'][0]);
@@ -226,7 +249,12 @@ function desenha(gl, tipoForma=gl.LINE_LOOP, numVertices, locais,
     let matrizRotacaoX = m4.rotacaoX(angRadX);
     let matrizRotacaoY = m4.rotacaoY(angRadY);
     let matrizRotacaoZ = m4.rotacaoZ(angRadZ);
-    let matrizProjecao = m4.projecao(gl.canvas.clientWidth, gl.canvas.clientHeight, 400);
+    //let matrizProjecao = m4.projecao(gl.canvas.clientWidth, gl.canvas.clientHeight, 400);
+    let aspecto = gl.canvas.clientWidth / gl.canvas.clientHeight;
+    let zNear = 1;
+    let zFar = 2000;
+    let campoVisaoRad = 60 * Math.PI / 180;
+    let matrizProjecao = m4.perspectiva(campoVisaoRad, aspecto, zNear, zFar);
 
     configuraMatrizUniform(gl, locais['uniforms'][1], matrizEscala);
     configuraMatrizUniform(gl, locais['uniforms'][2], matrizTranslacao);
@@ -234,6 +262,9 @@ function desenha(gl, tipoForma=gl.LINE_LOOP, numVertices, locais,
     configuraMatrizUniform(gl, locais['uniforms'][4], matrizRotacaoY);
     configuraMatrizUniform(gl, locais['uniforms'][5], matrizRotacaoZ);
     configuraMatrizUniform(gl, locais['uniforms'][6], matrizProjecao);
+    configuraFloatUniform(gl, locais['uniforms'][7], angRadX);
+    configuraFloatUniform(gl, locais['uniforms'][8], angRadY);
+    configuraFloatUniform(gl, locais['uniforms'][9], angRadZ);
     
     gl.drawArrays(tipoForma, 0, numVertices);
 }
