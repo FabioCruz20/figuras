@@ -7,12 +7,12 @@ function main() {
         return;
     }
 
-    let t1 = new Piramide();
+    let t1 = new Tetraedro();
     // configuração inicial do webgl
     locais = setup(gl, t1);
 
     let transf = {
-        'translacao': [100, 50, 0],
+        'translacao': [0, 0, -500],
         'escala': [1, 1, 1],
         'rotacao': [0, 0, 0]
     };

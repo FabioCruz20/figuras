@@ -8,24 +8,58 @@
     <body onload="main()">
         <canvas id="canvas"></canvas>
         <form>
-            <formgroup>
+            <fieldset>
                 <legend>Translação</legend>
-                X: <input type="range" id="t0" min="0" max="400">
-                Y: <input type="range" id="t1" min="0" max="300">
-                Z: <input type="range" id="t2" min="-200" max="200">
-            </formgroup>
-            <formgroup>
+                <label>X:</label>
+                <input type="range" id="t0" min="-200" max="200" value="0">
+                <label>Y:</label>
+                <input type="range" id="t1" min="-200" max="200" value="0">
+                <label>Z: </label><input type="range" id="t2" min="-1000" max="0" value="-500">
+            </fieldset>
+            <fieldset>
                 <legend>Rotação</legend>
-                X: <input type="range" id="r0" min="0" max="360">
-                Y: <input type="range" id="r1" min="0" max="360">
-                Z: <input type="range" id="r2" min="0" max="360">
-            </formgroup>
-            <formgroup>
+                <label>X: </label>
+                <input type="range" id="r0" min="0" max="360">
+                <label>Y: </label>
+                <input type="range" id="r1" min="0" max="360">
+                <label>Z: </label>
+                <input type="range" id="r2" min="0" max="360">
+            </fieldset>
+            <fieldset>
                 <legend>Escala</legend>
-                X: <input type="range" id="s0" min="0.1" max="2" step="0.1">
-                Y: <input type="range" id="s1" min="0.1" max="2" step="0.1">
-                Z: <input type="range" id="s2" min="0.1" max="2" step="0.1">
-            </formgroup>
+                <label>X: </label>
+                <input type="range" id="s0" min="0.1" max="2" step="0.1">
+                <label>Y: </label>
+                <input type="range" id="s1" min="0.1" max="2" step="0.1">
+                <label>Z: </label>
+                <input type="range" id="s2" min="0.1" max="2" step="0.1">
+            </fieldset>
+            <fieldset>
+                <legend>Ponto inicial</legend>
+                <label>X: </label>
+                <input type="number" id="pinicio0" min="-200" max="200" value="0">
+                <label>Y: </label>
+                <input type="number" id="pinicio1" min="-200" max="200" value="0">
+                <label>Z: </label>
+                <input type="number" id="pinicio2" min="-1000" max="0" value="-500">
+            </fieldset>
+            <fieldset>
+                <legend>Ponto final</legend>
+                <label>X: </label>
+                <input type="number" id="pfinal0" min="-200" max="200" value="0">
+                <label>Y: </label>
+                <input type="number" id="pfinal1" min="-200" max="200" value="0">
+                <label>Z: </label>
+                <input type="number" id="pfinal2" min="-1000" max="0" value="-500">
+            </fieldset>
+            <fieldset>
+                <button type="button" id="mover">Mover</button>
+            </fieldset>
+            <fieldset>
+                <h4>Observação:</h4>
+                <p>Intervalos de translação para X e Y: [-200, 200]</p>
+                <p>Intervalos de translação para Z: [-1000, 0]</p>
+            </fieldset>
         </form>
     </body>
     <script src="js/matrizes/matriz3.js"></script>
@@ -33,7 +67,7 @@
     <script src="js/setup-webgl/webgl-utils.js"></script>
     <script src="js/setup-webgl/setup.js"></script>
     <script src="js/classes/3d/figura3d.js"></script>
-    <script src="js/classes/3d/piramide.js"></script>
+    <script src="js/classes/3d/tetraedro.js"></script>
     <script src="js/eventos/eventos.js"></script>
     <script src="js/main/main.js"></script>
 </html>
