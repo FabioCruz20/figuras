@@ -7,7 +7,7 @@ function main() {
         return;
     }
 
-    let t1 = new Piramide();
+    let t1 = new Tetraedro();
     // configuração inicial do webgl
     locais = setup(gl, t1);
 
